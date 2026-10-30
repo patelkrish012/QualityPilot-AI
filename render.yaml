@@ -3,7 +3,7 @@ services:
     name: qualitypilot-api
     runtime: node
     rootDir: .
-    buildCommand: npm install --include=dev && node_modules/.bin/nest build --config apps/api/nest-cli.json
+    buildCommand: npm install && npm run build --workspace=@qualitypilot/api
     startCommand: node apps/api/dist/main
     healthCheckPath: /api/v1/health
     envVars:
