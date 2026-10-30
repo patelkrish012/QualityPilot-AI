@@ -1,0 +1,342 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum OrgRole {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+enum TestingMode {
+  MODE_A_URL_BLACKBOX
+  MODE_B_SOURCE_WHITEBOX
+}
+
+enum TestDepth {
+  QUICK
+  STANDARD
+  DEEP
+}
+
+enum TestStatus {
+  PASS
+  FAIL
+  BLOCKED
+  SKIPPED
+  ERROR
+  NOT_APPLICABLE
+}
+
+enum TestRunStatus {
+  REQUESTED
+  QUEUED
+  RUNNING
+  DISCOVERY
+  EXECUTING
+  EVIDENCE_COLLECTION
+  ANALYSIS
+  REPORT_GENERATION
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum Severity {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+  INFO
+}
+
+enum ReleaseRisk {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum ReleaseRecommendation {
+  APPROVED
+  APPROVED_WITH_WARNINGS
+  REQUIRES_FIXES
+  BLOCKED
+}
+
+model Organization {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members     OrganizationMember[]
+  projects    Project[]
+  auditLogs   AuditLog[]
+
+  @@map("organizations")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  fullName     String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  memberships  OrganizationMember[]
+  auditLogs    AuditLog[]
+
+  @@map("users")
+}
+
+model OrganizationMember {
+  id             String       @id @default(uuid())
+  organizationId String
+  userId         String
+  role           OrgRole      @default(MEMBER)
+  createdAt      DateTime     @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+  @@map("organization_members")
+}
+
+model Project {
+  id             String        @id @default(uuid())
+  organizationId String
+  name           String
+  description    String?
+  targetUrl      String
+  mode           TestingMode   @default(MODE_A_URL_BLACKBOX)
+  repositoryUrl  String?
+  branch         String?       @default("main")
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  applications   Application[]
+  credentials    Credential[]
+  requirements   Requirement[]
+  testSuites     TestSuite[]
+  testRuns       TestRun[]
+
+  @@map("projects")
+}
+
+model Application {
+  id           String        @id @default(uuid())
+  projectId    String
+  name         String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  project      Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  environments Environment[]
+
+  @@map("applications")
+}
+
+model Environment {
+  id            String      @id @default(uuid())
+  applicationId String
+  name          String      // e.g. "Production", "Staging", "Local"
+  baseUrl       String
+  isDefault     Boolean     @default(false)
+  createdAt     DateTime    @default(now())
+
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@map("environments")
+}
+
+model Credential {
+  id               String   @id @default(uuid())
+  projectId        String
+  name             String
+  username         String
+  encryptedPassword String  // AES-256-GCM encrypted
+  targetRole       String?
+  createdAt        DateTime @default(now())
+
+  project          Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("credentials")
+}
+
+model Requirement {
+  id          String            @id @default(uuid())
+  projectId   String
+  code        String            // e.g., "REQ-AUTH-01"
+  title       String
+  description String
+  isAmbiguous Boolean           @default(false)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  project     Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  rules       RequirementRule[]
+
+  @@unique([projectId, code])
+  @@map("requirements")
+}
+
+model RequirementRule {
+  id            String      @id @default(uuid())
+  requirementId String
+  ruleText      String
+  isMeasurable  Boolean     @default(true)
+  createdAt     DateTime    @default(now())
+
+  requirement   Requirement @relation(fields: [requirementId], references: [id], onDelete: Cascade)
+  testCases     TestCase[]
+
+  @@map("requirement_rules")
+}
+
+model TestSuite {
+  id          String     @id @default(uuid())
+  projectId   String
+  name        String
+  description String?
+  createdAt   DateTime   @default(now())
+
+  project     Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  testCases   TestCase[]
+
+  @@map("test_suites")
+}
+
+model TestCase {
+  id                String           @id @default(uuid())
+  testSuiteId       String
+  requirementRuleId String?
+  identifier        String           // e.g., "AUTH-PWD-001"
+  title             String
+  description       String?
+  category          String           // "Positive", "Negative", "Boundary", "Accessibility", etc.
+  severity          Severity         @default(MEDIUM)
+  steps             Json             // structured sequence of actions/assertions
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  testSuite         TestSuite        @relation(fields: [testSuiteId], references: [id], onDelete: Cascade)
+  requirementRule   RequirementRule? @relation(fields: [requirementRuleId], references: [id], onDelete: SetNull)
+  testResults       TestResult[]
+
+  @@map("test_cases")
+}
+
+model TestRun {
+  id                 String                @id @default(uuid())
+  projectId          String
+  status             TestRunStatus         @default(REQUESTED)
+  depth              TestDepth             @default(STANDARD)
+  targetUrl          String
+  startedAt          DateTime?
+  completedAt        DateTime?
+  testsExecuted      Int                   @default(0)
+  testsPassed        Int                   @default(0)
+  testsFailed        Int                   @default(0)
+  testsBlocked       Int                   @default(0)
+  qualityScore       Float?
+  releaseRisk        ReleaseRisk?
+  releaseDecision    ReleaseRecommendation?
+  createdAt          DateTime              @default(now())
+
+  project            Project               @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  testResults        TestResult[]
+  defects            Defect[]
+  report             Report?
+
+  @@map("test_runs")
+}
+
+model TestResult {
+  id            String     @id @default(uuid())
+  testRunId     String
+  testCaseId    String
+  status        TestStatus
+  durationMs    Int
+  errorMessage  String?
+  stackTrace    String?
+  executedAt    DateTime   @default(now())
+
+  testRun       TestRun    @relation(fields: [testRunId], references: [id], onDelete: Cascade)
+  testCase      TestCase   @relation(fields: [testCaseId], references: [id], onDelete: Cascade)
+  evidences     Evidence[]
+  defects       Defect[]
+
+  @@map("test_results")
+}
+
+model Evidence {
+  id           String     @id @default(uuid())
+  testResultId String
+  type         String     // "SCREENSHOT", "HAR", "CONSOLE_LOG", "DOM_SNAPSHOT", "VIDEO"
+  urlOrData    String     // S3/MinIO bucket path or text data
+  timestamp    DateTime   @default(now())
+
+  testResult   TestResult @relation(fields: [testResultId], references: [id], onDelete: Cascade)
+
+  @@map("evidences")
+}
+
+model Defect {
+  id             String      @id @default(uuid())
+  testRunId      String
+  testResultId   String
+  defectCode     String      // e.g. "DEF-001"
+  title          String
+  severity       Severity
+  observedCause  String      // FACT from deterministic engine
+  aiHypothesis   String      // AI reasoning hypothesis
+  recommendation String      // AI remediation step
+  retestStatus   String      @default("UNTESTED")
+  createdAt      DateTime    @default(now())
+
+  testRun        TestRun     @relation(fields: [testRunId], references: [id], onDelete: Cascade)
+  testResult     TestResult  @relation(fields: [testResultId], references: [id], onDelete: Cascade)
+
+  @@map("defects")
+}
+
+model Report {
+  id              String                @id @default(uuid())
+  testRunId       String                @unique
+  qualityScore    Float
+  releaseDecision ReleaseRecommendation
+  summaryMarkdown String
+  executiveReport Json                  // Conforms to 34-section Master Report Schema
+  createdAt       DateTime              @default(now())
+
+  testRun         TestRun               @relation(fields: [testRunId], references: [id], onDelete: Cascade)
+
+  @@map("reports")
+}
+
+model AuditLog {
+  id             String       @id @default(uuid())
+  organizationId String
+  userId         String?
+  action         String
+  entityType     String
+  entityId       String
+  details        Json?
+  createdAt      DateTime     @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("audit_logs")
+}

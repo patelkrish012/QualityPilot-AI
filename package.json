@@ -1,0 +1,29 @@
+{
+  "name": "qualitypilot-ai",
+  "version": "1.0.0",
+  "private": true,
+  "description": "QualityPilot AI - From Requirement to Release: AI-Powered Software Quality Engineering and Release Assurance",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:all": "npm run dev --workspaces",
+    "build:all": "npm run build --workspaces",
+    "lint:all": "npm run lint --workspaces",
+    "test:all": "npm run test --workspaces"
+  },
+  "keywords": [
+    "quality-assurance",
+    "software-testing",
+    "playwright",
+    "ai-testing",
+    "quality-engineering",
+    "release-assurance"
+  ],
+  "author": "QualityPilot AI Architecture Team",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "playwright": "^1.63.0"
+  }
+}

@@ -1,0 +1,67 @@
+# =============================================================
+# QualityPilot AI — .gitignore
+# =============================================================
+
+# ─── Node.js ──────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+package-lock.json
+
+# ─── Environment Variables (NEVER commit secrets!) ────────
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+apps/api/.env
+apps/web/.env
+apps/web/.env.local
+*.env
+
+# ─── Next.js Build Output ─────────────────────────────────
+apps/web/.next/
+apps/web/out/
+.next/
+
+# ─── NestJS / TypeScript Build Output ─────────────────────
+apps/api/dist/
+dist/
+
+# ─── Brand Assets (Base64 embedded — auto-generated) ──────
+apps/api/src/assets/brand-logo.ts
+apps/api/src/assets/brand-logo.js
+
+# ─── Playwright Browser Binaries ──────────────────────────
+playwright/.auth/
+test-results/
+playwright-report/
+
+# ─── Python Scripts (temp utility scripts) ────────────────
+process-logo.py
+refine-logo.py
+supersample-logo.py
+*.pyc
+__pycache__/
+
+# ─── IDE & Editor ─────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ─── Logs ─────────────────────────────────────────────────
+logs/
+*.log
+
+# ─── Testing Artifacts ────────────────────────────────────
+coverage/
+*.lcov
+
+# ─── Misc ─────────────────────────────────────────────────
+verify-all-phases.js
