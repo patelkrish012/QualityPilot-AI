@@ -1,0 +1,7 @@
+# Vercel deployment config for Next.js
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "installCommand": "npm install",
+  "framework": "nextjs"
+}

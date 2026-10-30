@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { ShieldCheck, Mail, Lock, User, ArrowRight, Github, AlertCircle, CheckCircle2, Key, GitFork, FolderLock, Globe, Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { API } from '@/lib/api';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -23,7 +24,7 @@ export default function RegisterPage() {
 
   const handleRedirectToGitHubOAuth = async () => {
     try {
-      const res = await fetch('http://localhost:4000/api/v1/auth/github/oauth-url');
+      const res = await fetch(API.auth.githubOauthUrl);
       const data = await res.json();
       if (data.clientIdConfigured && data.url) {
         window.location.href = data.url;
@@ -48,7 +49,7 @@ export default function RegisterPage() {
     setGithubLoading(true);
 
     try {
-      const res = await fetch('http://localhost:4000/api/v1/auth/github', {
+      const res = await fetch(API.auth.github, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -82,7 +83,7 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const res = await fetch('http://localhost:4000/api/v1/auth/register', {
+      const res = await fetch(API.auth.register, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ fullName, email, password }),

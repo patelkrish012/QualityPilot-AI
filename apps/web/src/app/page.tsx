@@ -41,6 +41,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import Link from 'next/link';
+import { API } from '@/lib/api';
 
 export default function HomePage() {
   // Navigation tabs
@@ -103,7 +104,7 @@ export default function HomePage() {
   // Fetch and restore saved user workspace and history from backend
   const fetchUserWorkspace = async (email: string) => {
     try {
-      const res = await fetch(`http://localhost:4000/api/v1/auth/workspace/${encodeURIComponent(email)}`);
+      const res = await fetch(API.auth.workspace(email));
       const data = await res.json();
       if (res.ok && data) {
         if (data.profile) {
@@ -142,7 +143,7 @@ export default function HomePage() {
     if (!currentUser?.email) return;
     setIsSavingWorkspace(true);
     try {
-      await fetch('http://localhost:4000/api/v1/auth/workspace/save', {
+      await fetch(API.auth.workspaceSave, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: currentUser.email, workspace: updates }),
@@ -189,7 +190,7 @@ export default function HomePage() {
     const emailToLogout = currentUser?.email;
     if (emailToLogout) {
       try {
-        const res = await fetch('http://localhost:4000/api/v1/auth/logout', {
+        const res = await fetch(API.auth.logout, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: emailToLogout }),
@@ -213,7 +214,7 @@ export default function HomePage() {
     e.preventDefault();
     if (!currentUser?.email) return;
     try {
-      const res = await fetch('http://localhost:4000/api/v1/auth/workspace/profile', {
+      const res = await fetch(API.auth.profile, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -261,7 +262,7 @@ export default function HomePage() {
     setIsConnectingGithub(true);
 
     try {
-      const res = await fetch('http://localhost:4000/api/v1/auth/github', {
+      const res = await fetch(API.auth.github, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -312,7 +313,7 @@ export default function HomePage() {
     }, 2200);
 
     try {
-      const res = await fetch('http://localhost:4000/api/v1/testing/mode-a/scan', {
+      const res = await fetch(API.testing.modeAScan, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: targetUrl, depth }),
@@ -326,7 +327,7 @@ export default function HomePage() {
 
       if (currentUser?.email && data.status !== 'FAILED') {
         saveUserWorkspace({ targetUrl, runResults: data });
-        fetch('http://localhost:4000/api/v1/auth/workspace/activity', {
+        fetch(API.auth.workspaceActivity, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -379,7 +380,7 @@ export default function HomePage() {
     setIsModeBScanning(true);
     setModeBResults(null);
     try {
-      const res = await fetch('http://localhost:4000/api/v1/testing/mode-b/scan', {
+      const res = await fetch(API.testing.modeBScan, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ repoName, token: githubToken }),
@@ -411,12 +412,12 @@ export default function HomePage() {
     setIsAnalyzingReq(true);
     try {
       const [analysisData, matrixData] = await Promise.all([
-        fetch('http://localhost:4000/api/v1/testing/requirements/analyze', {
+        fetch(API.testing.requirements, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ text: reqInput }),
         }).then((r) => r.json()),
-        fetch('http://localhost:4000/api/v1/testing/requirements/generate-matrix', {
+        fetch(API.testing.reqMatrix, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ code: 'REQ-001', rawText: reqInput }),
@@ -428,7 +429,7 @@ export default function HomePage() {
 
       if (currentUser?.email) {
         saveUserWorkspace({ reqInput, reqAnalysis: analysisData, testMatrix: matrixData.testCases });
-        fetch('http://localhost:4000/api/v1/auth/workspace/activity', {
+        fetch(API.auth.workspaceActivity, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -455,12 +456,12 @@ export default function HomePage() {
     setCopilotLoading(true);
     try {
       const [analysis, matrix] = await Promise.all([
-        fetch('http://localhost:4000/api/v1/testing/requirements/analyze', {
+        fetch(API.testing.requirements, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ text: copilotInput }),
         }).then((r) => r.json()),
-        fetch('http://localhost:4000/api/v1/testing/requirements/generate-matrix', {
+        fetch(API.testing.reqMatrix, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ code: 'QA-AI', rawText: copilotInput }),
@@ -486,7 +487,7 @@ export default function HomePage() {
   const handleDownloadPdf = async () => {
     setIsDownloadingPdf(true);
     try {
-      const res = await fetch('http://localhost:4000/api/v1/testing/reports/pdf', {
+      const res = await fetch(API.testing.pdf, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -524,7 +525,7 @@ export default function HomePage() {
     setEmailStatus(null);
 
     try {
-      const res = await fetch('http://localhost:4000/api/v1/testing/reports/send-email', {
+      const res = await fetch(API.testing.sendEmail, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -739,7 +740,7 @@ export default function HomePage() {
 
           <div className="flex items-center gap-3">
             <a
-              href="http://localhost:4000/api/docs"
+              href={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/docs`}
               target="_blank"
               rel="noreferrer"
               className="text-xs text-neutral-400 hover:text-[#F87171] border border-[#2a2a2a] hover:border-[#A31C18]/40 px-3 py-1.5 rounded-lg transition flex items-center gap-1.5"

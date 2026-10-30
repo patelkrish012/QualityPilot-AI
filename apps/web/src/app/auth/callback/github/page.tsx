@@ -3,6 +3,7 @@
 import React, { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ShieldCheck, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { API } from '@/lib/api';
 
 function GitHubCallbackContent() {
   const router = useRouter();
@@ -20,7 +21,7 @@ function GitHubCallbackContent() {
 
     async function exchangeOAuthCode() {
       try {
-        const res = await fetch('http://localhost:4000/api/v1/auth/github', {
+        const res = await fetch(API.auth.github, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ code }),
