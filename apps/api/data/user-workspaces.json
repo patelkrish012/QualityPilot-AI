@@ -1,0 +1,91 @@
+{
+  "patelkrish2890@gmail.com": {
+    "profile": {
+      "id": "usr-1792992715655-561",
+      "email": "patelkrish2890@gmail.com",
+      "fullName": "patelkrish2890",
+      "avatarUrl": "https://api.dicebear.com/7.x/bottts/svg?seed=patelkrish2890%40gmail.com",
+      "organizationName": "patelkrish2890's Workspace",
+      "role": "OWNER",
+      "provider": "email",
+      "createdAt": "2026-10-26T05:31:55.655Z",
+      "lastLoginAt": "2026-10-28T04:07:34.120Z",
+      "totalLogins": 15
+    },
+    "workspace": {
+      "targetUrl": "",
+      "depth": "STANDARD",
+      "persona": "BEGINNER",
+      "runResults": null,
+      "reqInput": "",
+      "reqAnalysis": null,
+      "testMatrix": null,
+      "selectedRepoUrl": "",
+      "selectedBranch": "main",
+      "selectedRepoName": "",
+      "modeBResults": null,
+      "lastSavedAt": "2026-10-28T05:31:29.070Z"
+    },
+    "history": []
+  },
+  "silpabhuvel@gmail.com": {
+    "profile": {
+      "id": "usr-1793160139438-615",
+      "email": "silpabhuvel@gmail.com",
+      "fullName": "silpabhuvel",
+      "avatarUrl": "https://api.dicebear.com/7.x/bottts/svg?seed=silpabhuvel%40gmail.com",
+      "organizationName": "silpabhuvel's Workspace",
+      "role": "OWNER",
+      "provider": "email",
+      "createdAt": "2026-10-28T04:02:19.438Z",
+      "lastLoginAt": "2026-10-28T05:21:33.631Z",
+      "totalLogins": 10
+    },
+    "workspace": {
+      "targetUrl": "",
+      "depth": "STANDARD",
+      "persona": "BEGINNER",
+      "runResults": null,
+      "reqInput": "",
+      "reqAnalysis": null,
+      "testMatrix": null,
+      "selectedRepoUrl": "",
+      "selectedBranch": "main",
+      "selectedRepoName": "",
+      "modeBResults": null,
+      "lastSavedAt": "2026-10-28T05:31:29.071Z"
+    },
+    "history": [],
+    "passwordHash": "$2b$10$P4.4clPpgvL.219cIytVL.DyQPdcY8oSCS7WImjVnq76deWrJ17.W"
+  },
+  "patelkrish9808@gmail.com": {
+    "profile": {
+      "id": "usr-1793162658131-808",
+      "email": "patelkrish9808@gmail.com",
+      "fullName": "patel dev",
+      "avatarUrl": "https://api.dicebear.com/7.x/bottts/svg?seed=patelkrish9808%40gmail.com",
+      "organizationName": "patel dev's Workspace",
+      "role": "OWNER",
+      "provider": "email",
+      "createdAt": "2026-10-28T04:44:18.131Z",
+      "lastLoginAt": "2026-10-28T05:20:36.098Z",
+      "totalLogins": 13
+    },
+    "workspace": {
+      "targetUrl": "",
+      "depth": "STANDARD",
+      "persona": "BEGINNER",
+      "runResults": null,
+      "reqInput": "",
+      "reqAnalysis": null,
+      "testMatrix": null,
+      "selectedRepoUrl": "",
+      "selectedBranch": "main",
+      "selectedRepoName": "",
+      "modeBResults": null,
+      "lastSavedAt": "2026-10-28T05:31:29.071Z"
+    },
+    "history": [],
+    "passwordHash": "$2b$10$Rbr2vR.mAyT8KG/yi916au2zF5YJQtLmrSpobFBqaeXDvbK4oqNaO"
+  }
+}

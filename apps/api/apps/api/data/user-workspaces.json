@@ -1,0 +1,68 @@
+{
+  "alex.developer@company.com": {
+    "profile": {
+      "id": "usr-1792991404114-769",
+      "email": "alex.developer@company.com",
+      "fullName": "alex.developer",
+      "avatarUrl": "https://api.dicebear.com/7.x/bottts/svg?seed=alex.developer%40company.com",
+      "organizationName": "alex.developer's Workspace",
+      "role": "OWNER",
+      "provider": "email",
+      "createdAt": "2026-10-26T05:10:04.114Z",
+      "lastLoginAt": "2026-10-26T05:10:04.114Z",
+      "totalLogins": 1
+    },
+    "workspace": {
+      "targetUrl": "https://example.com",
+      "depth": "STANDARD",
+      "persona": "BEGINNER",
+      "runResults": null,
+      "reqInput": "Password must be strong and secure.",
+      "reqAnalysis": null,
+      "testMatrix": null,
+      "selectedRepoUrl": "https://github.com/qualitypilot/core-api",
+      "selectedBranch": "main",
+      "selectedRepoName": "qualitypilot/core-api",
+      "modeBResults": null,
+      "lastSavedAt": "2026-10-26T05:10:04.114Z"
+    },
+    "history": []
+  },
+  "alex.qa@qualitypilot.io": {
+    "profile": {
+      "id": "usr-1792992104145-302",
+      "email": "alex.qa@qualitypilot.io",
+      "fullName": "alex.qa",
+      "avatarUrl": "https://api.dicebear.com/7.x/bottts/svg?seed=alex.qa%40qualitypilot.io",
+      "organizationName": "alex.qa's Workspace",
+      "role": "OWNER",
+      "provider": "email",
+      "createdAt": "2026-10-26T05:21:44.145Z",
+      "lastLoginAt": "2026-10-26T05:21:48.359Z",
+      "totalLogins": 7
+    },
+    "workspace": {
+      "targetUrl": "https://staging.myecommerce.com",
+      "depth": "DEEP",
+      "persona": "DEVELOPER",
+      "runResults": null,
+      "reqInput": "User checkout must support 3D Secure 2.0 with biometric validation and OTP fallback.",
+      "reqAnalysis": null,
+      "testMatrix": null,
+      "selectedRepoUrl": "https://github.com/my-org/checkout-service",
+      "selectedBranch": "feature/payment-v2",
+      "selectedRepoName": "qualitypilot/core-api",
+      "modeBResults": null,
+      "lastSavedAt": "2026-10-26T05:21:44.172Z"
+    },
+    "history": [
+      {
+        "id": "act-1792992104183-221",
+        "timestamp": "2026-10-26T05:21:44.183Z",
+        "type": "TEST_RUN",
+        "target": "https://staging.myecommerce.com",
+        "summary": "Deep Autonomous Crawl - 12 routes tested, 0 broken links, 98% health score."
+      }
+    ]
+  }
+}
