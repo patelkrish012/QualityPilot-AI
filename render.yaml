@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: qualitypilot-api
+    runtime: node
+    rootDir: .
+    buildCommand: npm install && npm run build --workspace=@qualitypilot/api
+    startCommand: node apps/api/dist/main
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
