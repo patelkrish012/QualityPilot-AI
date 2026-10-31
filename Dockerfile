@@ -18,6 +18,9 @@ RUN npm install --include=dev
 COPY packages/ ./packages/
 COPY apps/api/ ./apps/api/
 
+# Generate Prisma client FIRST
+RUN npx prisma generate --schema=packages/database/prisma/schema.prisma
+
 # Build packages in order
 RUN npm run build --workspace=@qualitypilot/types
 RUN npm run build --workspace=@qualitypilot/ai-engine
@@ -40,6 +43,13 @@ COPY packages/testing-engine/package*.json ./packages/testing-engine/
 
 # Install only production deps
 RUN npm install --omit=dev
+
+# Copy prisma schema for runtime migrations
+COPY packages/database/prisma ./packages/database/prisma
+
+# Copy generated Prisma client from builder
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
 # Copy built files from builder
 COPY --from=builder /app/packages/types/dist ./packages/types/dist
