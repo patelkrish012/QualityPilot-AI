@@ -41,9 +41,13 @@ import {
   ArrowRight
 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { API } from '@/lib/api';
 
 export default function HomePage() {
+  const router = useRouter();
+  const [authChecking, setAuthChecking] = useState(true);
+
   // Navigation tabs
   const [activeTab, setActiveTab] = useState<'RUNNER' | 'CODE' | 'REQUIREMENTS' | 'DEV_INTEL' | 'AUDIT' | 'REPORT'>('RUNNER');
 
@@ -157,14 +161,28 @@ export default function HomePage() {
 
   useEffect(() => {
     const storedUser = localStorage.getItem('qp_user');
-    if (storedUser) {
-      try {
-        const parsed = JSON.parse(storedUser);
-        setCurrentUser(parsed);
-        if (parsed.email) {
-          fetchUserWorkspace(parsed.email);
-        }
-      } catch (e) {}
+    const storedToken = localStorage.getItem('qp_token');
+
+    // If no active session, redirect to /login immediately
+    if (!storedUser || !storedToken) {
+      router.replace('/login');
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(storedUser);
+      if (!parsed || !parsed.email) {
+        router.replace('/login');
+        return;
+      }
+      setCurrentUser(parsed);
+      if (parsed.email) {
+        fetchUserWorkspace(parsed.email);
+      }
+      setAuthChecking(false);
+    } catch (e) {
+      router.replace('/login');
+      return;
     }
 
     const storedRepos = localStorage.getItem('qp_github_repos');
@@ -184,7 +202,7 @@ export default function HomePage() {
     if (preview) {
       setEmailPreviewUrl(preview);
     }
-  }, []);
+  }, [router]);
 
   const handleLogout = async () => {
     const emailToLogout = currentUser?.email;
@@ -208,6 +226,7 @@ export default function HomePage() {
     setCurrentUser(null);
     setGithubRepos([]);
     setShowProfileModal(false);
+    router.replace('/login');
   };
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
@@ -555,6 +574,20 @@ export default function HomePage() {
       setIsSendingEmail(false);
     }
   };
+
+  if (authChecking) {
+    return (
+      <div className="min-h-screen bg-[#06110C] flex flex-col items-center justify-center text-white">
+        <div className="h-16 w-16 rounded-2xl bg-[#06110C] border border-[#262626] flex items-center justify-center p-2 shadow-xl shadow-[#A31C18]/30 mb-4 animate-pulse">
+          <img src="/brand/qualitypilot-icon.png" alt="QualityPilot" className="h-full w-full object-contain" />
+        </div>
+        <div className="flex items-center gap-2.5 text-xs text-neutral-400">
+          <div className="w-4 h-4 border-2 border-[#A31C18] border-t-transparent rounded-full animate-spin"></div>
+          <span>Authenticating QualityPilot session...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-[#06110C] text-neutral-100 font-sans">

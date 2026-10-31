@@ -21,6 +21,15 @@ export default function LoginPage() {
   const [githubUsername, setGithubUsername] = useState('');
   const [githubToken, setGithubToken] = useState('');
 
+  // If already logged in, redirect to dashboard
+  React.useEffect(() => {
+    const storedUser = localStorage.getItem('qp_user');
+    const storedToken = localStorage.getItem('qp_token');
+    if (storedUser && storedToken) {
+      router.replace('/');
+    }
+  }, [router]);
+
   const handleRedirectToGitHubOAuth = async () => {
     try {
       const res = await fetch(API.auth.githubOauthUrl);
