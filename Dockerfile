@@ -63,4 +63,4 @@ ENV PORT=10000
 
 EXPOSE 10000
 
-CMD ["node", "apps/api/dist/main"]
+CMD ["sh", "-c", "npx prisma db push --schema=packages/database/prisma/schema.prisma --accept-data-loss || true; node apps/api/dist/main"]

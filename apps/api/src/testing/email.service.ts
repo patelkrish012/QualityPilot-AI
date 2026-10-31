@@ -31,7 +31,7 @@ export class EmailService {
     const smtpPort = parseInt(process.env.SMTP_PORT || '587', 10);
     const smtpSecure = process.env.SMTP_SECURE === 'true';
 
-    // 1. If explicit SMTP credentials exist, create production SMTP transporter
+    // 1. If explicit SMTP credentials exist, create production SMTP transporter with fast timeouts
     if (smtpHost && smtpUser && smtpPass) {
       this.transporter = nodemailer.createTransport({
         host: smtpHost,
@@ -41,6 +41,9 @@ export class EmailService {
           user: smtpUser,
           pass: smtpPass,
         },
+        connectionTimeout: 4000,
+        greetingTimeout: 4000,
+        socketTimeout: 5000,
       });
       this.logger.log(`[EmailService] Configured production SMTP via ${smtpHost}:${smtpPort}`);
       return;
@@ -431,18 +434,35 @@ export class EmailService {
       }
     }
 
-    // 2. Fallback to Nodemailer (SMTP / Ethereal)
-    const info = await this.transporter!.sendMail(options);
-    const previewUrl = nodemailer.getTestMessageUrl(info);
-    if (previewUrl) {
-      this.logger.log(`[EmailService] Security Notice Preview: ${previewUrl}`);
+    // 2. Fallback to Nodemailer (SMTP / Ethereal) with safety timeout
+    try {
+      if (!this.transporter) return { success: false, provider: 'NONE', messageId: null, previewUrl: null };
+      
+      const sendPromise = this.transporter.sendMail(options);
+      const timeoutPromise = new Promise<never>((_, reject) => 
+        setTimeout(() => reject(new Error('SMTP send timed out after 5s')), 5000)
+      );
+
+      const info: any = await Promise.race([sendPromise, timeoutPromise]);
+      const previewUrl = nodemailer.getTestMessageUrl(info);
+      if (previewUrl) {
+        this.logger.log(`[EmailService] Security Notice Preview: ${previewUrl}`);
+      }
+      return {
+        success: true,
+        provider: previewUrl ? 'ETHEREAL_PREVIEW' : 'SMTP',
+        messageId: info.messageId,
+        previewUrl: previewUrl || null,
+      };
+    } catch (err: any) {
+      this.logger.warn(`[EmailService] Mail dispatch non-fatal error: ${err.message}`);
+      return {
+        success: false,
+        provider: 'FAILED',
+        messageId: null,
+        previewUrl: null,
+      };
     }
-    return {
-      success: true,
-      provider: previewUrl ? 'ETHEREAL_PREVIEW' : 'SMTP',
-      messageId: info.messageId,
-      previewUrl: previewUrl || null,
-    };
   }
 
   async sendLoginNotificationEmail(to: string, fullName: string, provider: string, meta?: { ip?: string; time?: string }) {

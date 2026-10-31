@@ -39,7 +39,7 @@ export class AuthService {
       const passwordHash = await bcrypt.hash(dto.password, 10);
       const slug = orgName.toLowerCase().replace(/[^a-z0-9]/g, '-') + '-' + Math.floor(Math.random() * 1000);
 
-      return await this.prisma.$transaction(async (tx) => {
+      const txResult = await this.prisma.$transaction(async (tx) => {
         const org = await tx.organization.create({
           data: {
             name: orgName,
@@ -78,22 +78,29 @@ export class AuthService {
           orgName,
         );
 
-        let emailNotification: any = null;
-        try {
-          emailNotification = await this.emailService.sendLoginNotificationEmail(user.email, user.fullName, 'Email Registration');
-        } catch (e: any) {
-          this.logger.warn(`Login notification email dispatch error: ${e.message}`);
-        }
-
         return {
-          user: userRecord.profile,
-          organization: org,
+          user,
+          org,
           token,
-          emailNotification,
-          workspace: userRecord.workspace,
-          history: userRecord.history,
+          userRecord,
         };
       });
+
+      let emailNotification: any = null;
+      try {
+        emailNotification = await this.emailService.sendLoginNotificationEmail(txResult.user.email, txResult.user.fullName, 'Email Registration');
+      } catch (e: any) {
+        this.logger.warn(`Login notification email dispatch error: ${e.message}`);
+      }
+
+      return {
+        user: txResult.userRecord.profile,
+        organization: txResult.org,
+        token: txResult.token,
+        emailNotification,
+        workspace: txResult.userRecord.workspace,
+        history: txResult.userRecord.history,
+      };
     } catch (dbErr: any) {
       if (dbErr instanceof BadRequestException) {
         throw dbErr;
