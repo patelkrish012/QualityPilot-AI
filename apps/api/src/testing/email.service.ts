@@ -31,7 +31,7 @@ export class EmailService {
     const smtpPort = parseInt(process.env.SMTP_PORT || '587', 10);
     const smtpSecure = process.env.SMTP_SECURE === 'true';
 
-    // 1. If explicit SMTP credentials exist, create production SMTP transporter with fast timeouts
+    // 1. If explicit SMTP credentials exist, create production SMTP transporter with healthy timeouts
     if (smtpHost && smtpUser && smtpPass) {
       this.transporter = nodemailer.createTransport({
         host: smtpHost,
@@ -41,9 +41,9 @@ export class EmailService {
           user: smtpUser,
           pass: smtpPass,
         },
-        connectionTimeout: 4000,
-        greetingTimeout: 4000,
-        socketTimeout: 5000,
+        connectionTimeout: 15000,
+        greetingTimeout: 15000,
+        socketTimeout: 20000,
       });
       this.logger.log(`[EmailService] Configured production SMTP via ${smtpHost}:${smtpPort}`);
       return;
@@ -440,7 +440,7 @@ export class EmailService {
       
       const sendPromise = this.transporter.sendMail(options);
       const timeoutPromise = new Promise<never>((_, reject) => 
-        setTimeout(() => reject(new Error('SMTP send timed out after 5s')), 5000)
+        setTimeout(() => reject(new Error('SMTP send timed out after 25s')), 25000)
       );
 
       const info: any = await Promise.race([sendPromise, timeoutPromise]);

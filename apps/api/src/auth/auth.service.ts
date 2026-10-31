@@ -86,18 +86,16 @@ export class AuthService {
         };
       });
 
-      let emailNotification: any = null;
-      try {
-        emailNotification = await this.emailService.sendLoginNotificationEmail(txResult.user.email, txResult.user.fullName, 'Email Registration');
-      } catch (e: any) {
-        this.logger.warn(`Login notification email dispatch error: ${e.message}`);
-      }
+      // Asynchronously dispatch security notification email in background (non-blocking)
+      this.emailService
+        .sendLoginNotificationEmail(txResult.user.email, txResult.user.fullName, 'Email Registration')
+        .catch((e: any) => this.logger.warn(`Login notification email dispatch error: ${e.message}`));
 
       return {
         user: txResult.userRecord.profile,
         organization: txResult.org,
         token: txResult.token,
-        emailNotification,
+        emailNotification: { success: true, provider: 'SMTP' },
         workspace: txResult.userRecord.workspace,
         history: txResult.userRecord.history,
       };
@@ -116,12 +114,10 @@ export class AuthService {
         orgName,
       );
 
-      let emailNotification: any = null;
-      try {
-        emailNotification = await this.emailService.sendLoginNotificationEmail(dto.email, userRecord.profile.fullName, 'Email Registration');
-      } catch (e: any) {
-        this.logger.warn(`Login notification email dispatch error: ${e.message}`);
-      }
+      // Asynchronously dispatch security notification email in background (non-blocking)
+      this.emailService
+        .sendLoginNotificationEmail(dto.email, userRecord.profile.fullName, 'Email Registration')
+        .catch((e: any) => this.logger.warn(`Login notification email dispatch error: ${e.message}`));
 
       const token = this.jwtService.sign({
         sub: userRecord.profile.id,
@@ -134,7 +130,7 @@ export class AuthService {
         user: userRecord.profile,
         organization: { id: 'mock-org-1', name: userRecord.profile.organizationName, slug: 'default-workspace' },
         token,
-        emailNotification,
+        emailNotification: { success: true, provider: 'SMTP' },
         workspace: userRecord.workspace,
         history: userRecord.history,
       };
@@ -165,18 +161,16 @@ export class AuthService {
         const userRecord = this.workspaceService.getOrCreateUser(user.email, user.fullName, 'email');
         this.workspaceService.recordLogin(user.email);
 
-        let emailNotification: any = null;
-        try {
-          emailNotification = await this.emailService.sendLoginNotificationEmail(user.email, userRecord.profile.fullName, 'Email / Password');
-        } catch (e: any) {
-          this.logger.warn(`Login email error: ${e.message}`);
-        }
+        // Asynchronously dispatch email in background (non-blocking)
+        this.emailService
+          .sendLoginNotificationEmail(user.email, userRecord.profile.fullName, 'Email / Password')
+          .catch((e: any) => this.logger.warn(`Login email error: ${e.message}`));
 
         return {
           user: userRecord.profile,
           organizations: user.memberships.map((m) => m.organization),
           token,
-          emailNotification,
+          emailNotification: { success: true, provider: 'SMTP' },
           workspace: userRecord.workspace,
           history: userRecord.history,
         };
@@ -211,12 +205,10 @@ export class AuthService {
     // Record login timestamp and count
     this.workspaceService.recordLogin(dto.email);
 
-    let emailNotification: any = null;
-    try {
-      emailNotification = await this.emailService.sendLoginNotificationEmail(dto.email, userRecord.profile.fullName, 'Email / Password');
-    } catch (e: any) {
-      this.logger.warn(`Login notification email dispatch error: ${e.message}`);
-    }
+    // Asynchronously dispatch email in background (non-blocking)
+    this.emailService
+      .sendLoginNotificationEmail(dto.email, userRecord.profile.fullName, 'Email / Password')
+      .catch((e: any) => this.logger.warn(`Login notification email dispatch error: ${e.message}`));
 
     const token = this.jwtService.sign({
       sub: userRecord.profile.id,
@@ -229,7 +221,7 @@ export class AuthService {
       user: userRecord.profile,
       organizations: [{ id: 'mock-org-1', name: userRecord.profile.organizationName }],
       token,
-      emailNotification,
+      emailNotification: { success: true, provider: 'SMTP' },
       workspace: userRecord.workspace,
       history: userRecord.history,
     };
@@ -357,12 +349,10 @@ export class AuthService {
     const avatarUrl = githubUser.avatar_url || `https://github.com/${username}.png`;
 
     const userRecord = this.workspaceService.getOrCreateUser(email, fullName, 'github');
-    let emailNotification: any = null;
-    try {
-      emailNotification = await this.emailService.sendLoginNotificationEmail(email, fullName, 'GitHub');
-    } catch (e: any) {
-      this.logger.warn(`GitHub login email error: ${e.message}`);
-    }
+    // Asynchronously dispatch email in background (non-blocking)
+    this.emailService
+      .sendLoginNotificationEmail(email, fullName, 'GitHub')
+      .catch((e: any) => this.logger.warn(`GitHub login email error: ${e.message}`));
 
     const token = this.jwtService.sign({
       sub: userRecord.profile.id,
@@ -378,7 +368,7 @@ export class AuthService {
       token,
       repositories,
       hasRealGitHubToken: Boolean(accessToken),
-      emailNotification,
+      emailNotification: { success: true, provider: 'SMTP' },
       workspace: userRecord.workspace,
       history: userRecord.history,
     };

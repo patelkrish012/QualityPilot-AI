@@ -38,7 +38,9 @@ import {
   CheckCheck,
   Bot,
   AlertCircle,
-  ArrowRight
+  ArrowRight,
+  Menu,
+  X
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -47,6 +49,12 @@ import { API } from '@/lib/api';
 export default function HomePage() {
   const router = useRouter();
   const [authChecking, setAuthChecking] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const selectTab = (tab: 'RUNNER' | 'CODE' | 'REQUIREMENTS' | 'DEV_INTEL' | 'AUDIT' | 'REPORT') => {
+    setActiveTab(tab);
+    setMobileMenuOpen(false);
+  };
 
   // Navigation tabs
   const [activeTab, setActiveTab] = useState<'RUNNER' | 'CODE' | 'REQUIREMENTS' | 'DEV_INTEL' | 'AUDIT' | 'REPORT'>('RUNNER');
@@ -591,8 +599,18 @@ export default function HomePage() {
 
   return (
     <div className="flex min-h-screen bg-[#06110C] text-neutral-100 font-sans">
-      {/* SIDEBAR NAVIGATION */}
-      <aside className="w-64 bg-[#171717] border-r border-[#262626] flex flex-col shrink-0 h-screen sticky top-0 z-40">
+      {/* Mobile Drawer Overlay */}
+      {mobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 md:hidden animate-in fade-in"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* SIDEBAR NAVIGATION - Responsive Drawer */}
+      <aside className={`fixed inset-y-0 left-0 z-50 w-72 md:w-64 bg-[#171717] border-r border-[#262626] flex flex-col shrink-0 h-screen transition-transform duration-200 ease-in-out md:static md:translate-x-0 ${
+        mobileMenuOpen ? 'translate-x-0 shadow-2xl shadow-black/80' : '-translate-x-full'
+      }`}>
         <div className="p-4 border-b border-[#262626] flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="h-9 w-9 rounded-xl bg-[#06110C] border border-[#262626] flex items-center justify-center shrink-0 p-1 shadow-md shadow-[#A31C18]/20">
@@ -605,9 +623,18 @@ export default function HomePage() {
               <span className="text-[10px] text-neutral-400 font-medium">Release Assurance</span>
             </div>
           </div>
-          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#A31C18]/15 text-[#F87171] border border-[#A31C18]/30">
-            PRO
-          </span>
+          <div className="flex items-center gap-1.5">
+            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#A31C18]/15 text-[#F87171] border border-[#A31C18]/30">
+              PRO
+            </span>
+            <button
+              onClick={() => setMobileMenuOpen(false)}
+              className="md:hidden p-1 text-neutral-400 hover:text-white rounded-lg hover:bg-[#262626] transition ml-1"
+              aria-label="Close Sidebar"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto p-3 space-y-4">
@@ -617,7 +644,7 @@ export default function HomePage() {
             </span>
             <div className="space-y-1">
               <button
-                onClick={() => setActiveTab('RUNNER')}
+                onClick={() => selectTab('RUNNER')}
                 className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition ${
                   activeTab === 'RUNNER'
                     ? 'bg-[#A31C18] text-white shadow-md shadow-[#A31C18]/25 font-bold'
@@ -629,7 +656,7 @@ export default function HomePage() {
               </button>
 
               <button
-                onClick={() => setActiveTab('CODE')}
+                onClick={() => selectTab('CODE')}
                 className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition ${
                   activeTab === 'CODE'
                     ? 'bg-[#A31C18] text-white shadow-md shadow-[#A31C18]/25 font-bold'
@@ -650,7 +677,7 @@ export default function HomePage() {
               </button>
 
               <button
-                onClick={() => setActiveTab('REQUIREMENTS')}
+                onClick={() => selectTab('REQUIREMENTS')}
                 className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition ${
                   activeTab === 'REQUIREMENTS'
                     ? 'bg-[#A31C18] text-white shadow-md shadow-[#A31C18]/25 font-bold'
@@ -669,7 +696,7 @@ export default function HomePage() {
             </span>
             <div className="space-y-1">
               <button
-                onClick={() => setActiveTab('DEV_INTEL')}
+                onClick={() => selectTab('DEV_INTEL')}
                 className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition ${
                   activeTab === 'DEV_INTEL'
                     ? 'bg-[#A31C18] text-white shadow-md shadow-[#A31C18]/25 font-bold'
@@ -681,7 +708,7 @@ export default function HomePage() {
               </button>
 
               <button
-                onClick={() => setActiveTab('AUDIT')}
+                onClick={() => selectTab('AUDIT')}
                 className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition ${
                   activeTab === 'AUDIT'
                     ? 'bg-[#A31C18] text-white shadow-md shadow-[#A31C18]/25 font-bold'
@@ -693,7 +720,7 @@ export default function HomePage() {
               </button>
 
               <button
-                onClick={() => setActiveTab('REPORT')}
+                onClick={() => selectTab('REPORT')}
                 className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition ${
                   activeTab === 'REPORT'
                     ? 'bg-[#A31C18] text-white shadow-md shadow-[#A31C18]/25 font-bold'
@@ -759,24 +786,38 @@ export default function HomePage() {
       {/* MAIN CONTENT AREA */}
       <div className="flex-1 flex flex-col min-w-0 overflow-x-hidden">
         {/* Top Header */}
-        <header className="border-b border-[#262626] bg-[#171717]/90 backdrop-blur-md sticky top-0 z-30 h-14 flex items-center justify-between px-6">
-          <div className="flex items-center gap-2">
-            <h1 className="text-sm font-bold text-white">
-              {activeTab === 'RUNNER' && 'Web Testing (Mode A: Black-Box)'}
-              {activeTab === 'CODE' && 'Source Code Scanner (Mode B: White-Box)'}
-              {activeTab === 'REQUIREMENTS' && 'Requirement Intelligence & Test Matrix'}
-              {activeTab === 'DEV_INTEL' && 'AI Quality Assistant'}
-              {activeTab === 'AUDIT' && 'WCAG 2.1 & Performance Benchmarks'}
-              {activeTab === 'REPORT' && 'Release Readiness Master Audit'}
-            </h1>
+        <header className="border-b border-[#262626] bg-[#171717]/90 backdrop-blur-md sticky top-0 z-30 h-14 flex items-center justify-between px-3 sm:px-6">
+          <div className="flex items-center gap-2.5 min-w-0">
+            {/* Mobile Hamburger Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(true)}
+              className="md:hidden p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-[#262626] transition shrink-0"
+              aria-label="Open Navigation Menu"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="md:hidden h-7 w-7 rounded-lg bg-[#06110C] border border-[#262626] flex items-center justify-center shrink-0 p-0.5">
+                <img src="/brand/qualitypilot-icon.png" alt="QP" className="h-full w-full object-contain" />
+              </div>
+              <h1 className="text-xs sm:text-sm font-bold text-white truncate">
+                {activeTab === 'RUNNER' && 'Web Testing (Mode A)'}
+                {activeTab === 'CODE' && 'Code Scanner (Mode B)'}
+                {activeTab === 'REQUIREMENTS' && 'Requirement Matrix'}
+                {activeTab === 'DEV_INTEL' && 'AI Quality Assistant'}
+                {activeTab === 'AUDIT' && 'WCAG & Benchmarks'}
+                {activeTab === 'REPORT' && 'Release Readiness Master Audit'}
+              </h1>
+            </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <a
-              href={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/docs`}
+              href={`${process.env.NEXT_PUBLIC_API_URL || 'https://qualitypilot-ai.onrender.com'}/api/docs`}
               target="_blank"
               rel="noreferrer"
-              className="text-xs text-neutral-400 hover:text-[#F87171] border border-[#2a2a2a] hover:border-[#A31C18]/40 px-3 py-1.5 rounded-lg transition flex items-center gap-1.5"
+              className="hidden sm:flex text-xs text-neutral-400 hover:text-[#F87171] border border-[#2a2a2a] hover:border-[#A31C18]/40 px-3 py-1.5 rounded-lg transition items-center gap-1.5"
             >
               <span>Swagger API</span>
               <ExternalLink className="h-3 w-3" />
@@ -785,10 +826,10 @@ export default function HomePage() {
             {currentUser ? (
               <button
                 onClick={() => setShowProfileModal(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#222222] border border-[#2a2a2a] text-xs text-neutral-200 hover:border-[#A31C18]/50 transition"
+                className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-[#222222] border border-[#2a2a2a] text-xs text-neutral-200 hover:border-[#A31C18]/50 transition max-w-[130px] sm:max-w-none truncate"
               >
-                <User className="h-3.5 w-3.5 text-[#F87171]" />
-                <span className="font-semibold">{currentUser.fullName || currentUser.email}</span>
+                <User className="h-3.5 w-3.5 text-[#F87171] shrink-0" />
+                <span className="font-semibold truncate">{currentUser.fullName || currentUser.email}</span>
               </button>
             ) : (
               <Link
@@ -802,7 +843,7 @@ export default function HomePage() {
         </header>
 
         {/* Main Content Body */}
-        <main className="flex-1 max-w-6xl w-full mx-auto px-6 py-6 overflow-y-auto">
+        <main className="flex-1 max-w-6xl w-full mx-auto px-3.5 sm:px-6 py-4 sm:py-6 overflow-y-auto">
           {/* Notification Alert Banners */}
           {emailPreviewUrl && (
             <div className="w-full bg-indigo-950/40 border border-indigo-500/40 rounded-xl px-4 py-2.5 mb-4 flex items-center justify-between text-xs text-indigo-200">
@@ -870,8 +911,8 @@ export default function HomePage() {
                     />
                   </div>
 
-                  <div className="flex items-center justify-between pt-1">
-                    <div className="flex items-center gap-2">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+                    <div className="flex flex-wrap items-center gap-2">
                       <span className="text-xs text-neutral-400">Scan Depth:</span>
                       {(['QUICK', 'STANDARD', 'DEEP'] as const).map((d) => (
                         <button
@@ -892,7 +933,7 @@ export default function HomePage() {
                     <button
                       type="submit"
                       disabled={isRunning}
-                      className="inline-flex items-center gap-2 bg-[#A31C18] hover:bg-[#C2241F] disabled:opacity-50 text-white font-bold px-5 py-2 rounded-xl text-xs transition shadow-lg shadow-[#A31C18]/25"
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#A31C18] hover:bg-[#C2241F] disabled:opacity-50 text-white font-bold px-5 py-2 rounded-xl text-xs transition shadow-lg shadow-[#A31C18]/25"
                     >
                       {isRunning ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <Play className="h-3.5 w-3.5 fill-current" />}
                       <span>{isRunning ? 'Auditing Target...' : 'Run Live Test'}</span>

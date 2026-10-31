@@ -117,25 +117,25 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#06110C] text-neutral-100 flex flex-col justify-center items-center px-4 py-12">
-      <div className="w-full max-w-md space-y-8">
+    <div className="min-h-screen bg-[#06110C] text-neutral-100 flex flex-col justify-center items-center px-3.5 sm:px-4 py-8 sm:py-12">
+      <div className="w-full max-w-md space-y-6 sm:space-y-8">
         {/* Brand Header */}
         <div className="text-center">
           <div className="inline-block mb-2">
             <img 
               src="/brand/qualitypilot-logo.png" 
               alt="QualityPilot AI" 
-              className="h-16 w-auto mx-auto object-contain drop-shadow-[0_4px_20px_rgba(163,28,24,0.35)]" 
+              className="h-14 sm:h-16 w-auto mx-auto object-contain drop-shadow-[0_4px_20px_rgba(163,28,24,0.35)]" 
             />
           </div>
-          <h1 className="text-xl font-bold tracking-tight text-white">Sign In to QualityPilot</h1>
+          <h1 className="text-lg sm:text-xl font-bold tracking-tight text-white">Sign In to QualityPilot</h1>
           <p className="text-xs text-neutral-400 mt-1">
             Autonomous Quality Engineering & Release Assurance Platform
           </p>
         </div>
 
         {/* Authentication Card */}
-        <div className="bg-[#171717] border border-[#2a2a2a] rounded-2xl p-7 shadow-2xl space-y-6">
+        <div className="bg-[#171717] border border-[#2a2a2a] rounded-2xl p-5 sm:p-7 shadow-2xl space-y-5 sm:space-y-6">
           {error && (
             <div className="p-3.5 bg-red-950/40 border border-red-900/60 rounded-xl text-xs text-red-300 flex items-start gap-2.5">
               <AlertCircle className="h-4 w-4 shrink-0 text-red-400 mt-0.5" />
