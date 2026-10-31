@@ -31,9 +31,6 @@ apps/web/out/
 apps/api/dist/
 dist/
 
-# ─── Brand Assets (Base64 embedded — auto-generated) ──────
-apps/api/src/assets/brand-logo.ts
-apps/api/src/assets/brand-logo.js
 
 # ─── Playwright Browser Binaries ──────────────────────────
 playwright/.auth/
