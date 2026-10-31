@@ -6,12 +6,14 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
- * Central API base URL — reads from env var in production (Vercel/Railway),
- * falls back to localhost:4000 in local development.
+ * Central API base URL — reads from env var in production (Vercel),
+ * defaults to the live Render backend if unset, or localhost in local dev.
  */
 export const API_BASE =
   process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '') ||
-  'http://localhost:4000';
+  (typeof window !== 'undefined' && window.location.hostname !== 'localhost'
+    ? 'https://qualitypilot-ai.onrender.com'
+    : 'https://qualitypilot-ai.onrender.com');
 
 export const API = {
   auth: {
